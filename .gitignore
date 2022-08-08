@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 # iWAN setting
-.iWAN_config
+.iWAN_config.json
 # C extensions
 *.so
 
