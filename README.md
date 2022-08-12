@@ -1,5 +1,5 @@
 # cross_asset_monitor
-  1. need to add 'iWAN_config.json' under cross_asset_monitor folder
+  1. need to add 'iWAN_config.json' under cross_asset_monitor for futher use
         {
             "secretkey": "your secretkey", 
             "Apikey": "your apikey",
@@ -9,6 +9,6 @@
             "emailAddress":"your email address",
             "assetblackList":[black asset list]
         }
-  2. when add the no evm chain, need update cross_asset_monitor.getLockedAccount function to suuport the related chains.
+  2. when add the no evm chain, need update monitor_utility>Util>getLockedAccount function to support the related chains.
   3. when add the evm chain, just need to update 'https://github.com/Nevquit/configW/blob/main/chainInfos.json'
   
