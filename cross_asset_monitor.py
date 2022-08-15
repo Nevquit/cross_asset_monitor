@@ -2,7 +2,7 @@ from monitor_msg_tools import dingMsg,sendEmail,genhtml
 import json
 import copy
 from monitor_utility import BalanceUtility,StoremanUtility,TokenPairsUtility
-
+import time
 class CROSS_ASSET_MONITOR:
     def __init__(self,net):
         '''
@@ -16,6 +16,7 @@ class CROSS_ASSET_MONITOR:
 
 
 def main():
+    print('start',time.time())
     #.global variables
     assetblackList = []
     net = 'main'
@@ -23,7 +24,7 @@ def main():
     stm_utl = StoremanUtility.StoremanUtility(net,iWAN_config)
     tlpair_utl= TokenPairsUtility.TokenPairsUtility(net,iWAN_config)
     bal_utl = BalanceUtility.BalanceUtility(net, iWAN_config)
-    pooltoken_info = tlpair_utl.getPoolTokenDict()
+    pooltoken_info,poolTokenIDList = tlpair_utl.getPoolTokenDict()
     btcNodes = {'url':'http://nodes.wandevs.org:26893','user':'wanglu','pwd':'Wanchain888'}
     ltcNodes = {'url':'http://nodes.wandevs.org:26894','user':'wanglu','pwd':'Wanchain888'}
     dogeNodes = {'url':'http://44.239.180.2:26895','user':'wanglu','pwd':'Wanchain888'}
@@ -56,8 +57,8 @@ def main():
     #3. init the report data
     cr_mnt_report = {}
     report_titles = copy.deepcopy(supportChains)
-    report_titles.insert(0,'TotalLockedAmount')
-    report_titles.insert(0, 'LockedAmount')
+    report_titles.insert(0,'Total_locked_amount_h')
+    report_titles.insert(0, 'LockedAmount_Details')
     report_titles.insert(0, 'OriginalChains')
     report_titles.insert(0, 'Asset')
     report_titles.append('MintedTokenAmount')
@@ -88,29 +89,29 @@ def main():
                     get_balance_method = get_balance[chainType]['method']
                     get_balance_parameters =  get_balance[chainType]['parametes']
                     get_balance_parameters['address'] = acc
-                    balance = get_balance_method(get_balance_parameters)
+                    balance = get_balance_method(**get_balance_parameters)
                     if balance:
                         locked_amount += float(balance)
                     else:
                         print('get {} locked amount failed'.format(asset))
             if assetType == 'coin_evm':
                 for acc in LockedAccs_allGroups[chainType]:
-                    balance = bal_utl.getEVMChainCoinBalanceViaIwan(acc,chainType)
+                    balance = bal_utl.getEVMChainCoinBalanceViaIwan(acc,chainType)['result']
                     if balance:
                         locked_amount += float(balance)
                     else:
                         print('get {} locked amount failed'.format(asset))
             if assetType == 'token_evm':
                 for acc in LockedAccs_allGroups[chainType]:
-                    balance = bal_utl.getEVMChainTokenBalanceViaIwan(chainType,acc,tokenAddr)
+                    balance = bal_utl.getEVMChainTokenBalanceViaIwan(chainType,acc,tokenAddr)['result']
                     if balance:
                         locked_amount += float(balance)
                     else:
                         print('get {} locked amount failed'.format(asset))
             if ccType == 'pool':
                 PoolScAddress = pooltoken_info[asset][chainType]['PoolScAddress']
-                pool_remaining_amount = bal_utl.getEVMChainTokenBalanceViaIwan(chainType,PoolScAddress,tokenAddr)
-                pool_remaining_amount_h = float(pool_remaining_amount/(1*10**int(ancestorDecimals)))
+                pool_remaining_amount = bal_utl.getEVMChainTokenBalanceViaIwan(chainType,PoolScAddress,tokenAddr)['result']
+                pool_remaining_amount_h = float(int(pool_remaining_amount)/(1*10**int(ancestorDecimals)))
                 total_pool_remaining_amount_h += pool_remaining_amount_h
                 total_pool_pre_minted_amount_h += float(pooltoken_info[asset][chainType]['originalAmount'])
                 cr_mnt_report[originalchain].append(pool_remaining_amount_h) #pool preminted token is recored to report data as mapped token
@@ -138,7 +139,7 @@ def main():
             cr_mnt_report[notSupportedChain].append('//')
 
         #5 assert data
-        gap = (total_locked_amount_h + total_pool_remaining_amount_h) - total_pool_pre_minted_amount_h
+        gap = (total_locked_amount_h + total_pool_remaining_amount_h) - total_minted_token_amount_h-total_pool_pre_minted_amount_h
         if gap >= -0.00000001:  # 0,consider the precision use -0.0000000001 instead of 0
             status = 'Pass'
         else:
@@ -146,6 +147,13 @@ def main():
         cr_mnt_report['Status'].append(status)
         cr_mnt_report['Gap'].append(gap)
 
+        #6.
+        html = genhtml.html_build(cr_mnt_report,'Cross_Chain_Asset')
+        with open('./report','w') as f:
+            f.write(html)
+    print('stop', time.time())
+    print(json.dumps(cr_mnt_report))
+
 
 if __name__ == '__main__':
-    pass
+    main()
