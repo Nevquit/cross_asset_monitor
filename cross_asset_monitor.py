@@ -114,7 +114,7 @@ def main():
                 pool_remaining_amount_h = float(int(pool_remaining_amount)/(1*10**int(ancestorDecimals)))
                 total_pool_remaining_amount_h += pool_remaining_amount_h
                 total_pool_pre_minted_amount_h += float(pooltoken_info[asset][chainType]['originalAmount'])
-                cr_mnt_report[originalchain].append(pool_remaining_amount_h) #pool preminted token is recored to report data as mapped token
+                cr_mnt_report[originalchain].append("Pool_remaining_amount: {}".format(pool_remaining_amount_h)) #pool preminted token is recored to report data as mapped token
                 original_pool_chain.append(originalchain)
 
             locked_amount_h = float(locked_amount/(1*10**int(ancestorDecimals)))
