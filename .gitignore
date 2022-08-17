@@ -4,6 +4,8 @@ __pycache__/
 *$py.class
 # iWAN setting
 .iWAN_config.json
+# nodes
+.nodes.json
 # C extensions
 *.so
 

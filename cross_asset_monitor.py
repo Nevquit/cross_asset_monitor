@@ -25,9 +25,11 @@ def main():
     tlpair_utl= TokenPairsUtility.TokenPairsUtility(net,iWAN_config)
     bal_utl = BalanceUtility.BalanceUtility(net, iWAN_config)
     pooltoken_info,poolTokenIDList = tlpair_utl.getPoolTokenDict()
-    btcNodes = {'url':'http://nodes.wandevs.org:26893','user':'wanglu','pwd':'Wanchain888'}
-    ltcNodes = {'url':'http://nodes.wandevs.org:26894','user':'wanglu','pwd':'Wanchain888'}
-    dogeNodes = {'url':'http://44.239.180.2:26895','user':'wanglu','pwd':'Wanchain888'}
+    with open('./.nodes.json','r') as f:
+        nodes = json.load(f)
+    btcNodes = nodes['btcNodes']
+    ltcNodes = nodes['ltcNodes']
+    dogeNodes = nodes['dogeNodes']
 
     get_balance = \
         {'BTC': {'method': bal_utl.getBTCsBalance,
@@ -149,7 +151,7 @@ def main():
 
         #6.
         html = genhtml.html_build(cr_mnt_report,'Cross_Chain_Asset')
-        with open('./report','w') as f:
+        with open('./report.html','w') as f:
             f.write(html)
     print('stop', time.time())
     print(json.dumps(cr_mnt_report))
