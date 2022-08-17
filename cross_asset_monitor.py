@@ -30,7 +30,8 @@ def main():
     btcNodes = nodes['btcNodes']
     ltcNodes = nodes['ltcNodes']
     dogeNodes = nodes['dogeNodes']
-
+    xrpNodes = nodes['xrpNodes']
+    dotNodes = nodes['dotNodes']
     get_balance = \
         {'BTC': {'method': bal_utl.getBTCsBalance,
                  'parametes': {'chain': 'BTC', 'node': btcNodes['url'], 'user': btcNodes['user'],
@@ -42,9 +43,9 @@ def main():
                   'parametes': {'chain': 'DOGE', 'node': dogeNodes['url'], 'user': dogeNodes['user'],
                                 'password': dogeNodes['pwd']}},
          'XRP': {'method': bal_utl.getXRPBalance,
-                 'parametes': {'nodes': ['wss://nodes.wandevs.org/xrp:443'], 'address': ''}},
+                 'parametes': {'nodes': xrpNodes, 'address': ''}},
          'DOT': {'method': bal_utl.getDOTBalance,
-                 'parametes': {'nodes': ['wss://nodes.wandevs.org/polkadot'], 'address': ''}}
+                 'parametes': {'nodes': dotNodes, 'address': ''}}
          }
 
 
